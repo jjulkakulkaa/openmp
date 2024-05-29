@@ -3,78 +3,161 @@
 #include <omp.h>
 #include <cstdlib>
 #include <ctime>
+#include <random>
+
 
 // Encode a segment of the image using the pixel division method
 void encodeSegment(const cv::Mat& inputImage, cv::Mat& outputImage1, cv::Mat& outputImage2, int startRow, int endRow, int num_threads) {
     int cols = inputImage.cols;
 
-    srand(time(NULL) ^ omp_get_thread_num());
+    std::random_device rd;
+    std::mt19937 generator(rd() ^ omp_get_thread_num());
+    std::uniform_real_distribution<float> distribution(0.0, 1.0);
+
 
     for (int i = startRow; i < endRow; ++i) {
         for (int j = 0; j < cols; ++j) {
             int baseRow = i * 2;
             int baseCol = j * 2;
 
-            float random = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            float random = distribution(generator);
 
             if (inputImage.at<uchar>(i, j) == 0) {
                 if (random < 0.333f) {
+                    random = distribution(generator);
+                    if (random < 0.5f) {
+                        outputImage1.at<uchar>(baseRow, baseCol) = 0;
+                        outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol) = 255;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+
+                        outputImage2.at<uchar>(baseRow, baseCol) = 255;
+                        outputImage2.at<uchar>(baseRow, baseCol + 1) = 255;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+                    }
+                    else {
+                        outputImage2.at<uchar>(baseRow, baseCol) = 0;
+                        outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol) = 255;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+
+                        outputImage1.at<uchar>(baseRow, baseCol) = 255;
+                        outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol) = 0;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+                    }
+                }
+                else if (random < 0.666f) {
+
+                    random = distribution(generator);
+                    if (random < 0.5f) {
+                        outputImage1.at<uchar>(baseRow, baseCol) = 0;
+                        outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol) = 0;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+
+                        outputImage2.at<uchar>(baseRow, baseCol) = 255;
+                        outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol) = 255;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+                    }
+                    else {
+                        outputImage2.at<uchar>(baseRow, baseCol) = 0;
+                        outputImage2.at<uchar>(baseRow, baseCol + 1) = 255;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+
+                        outputImage1.at<uchar>(baseRow, baseCol) = 255;
+                        outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol) = 255;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+                    }
+
+                }
+                else {
+                    random = distribution(generator);
+                    if (random < 0.5f) {
+                        outputImage1.at<uchar>(baseRow, baseCol) = 0;
+                        outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol) = 255;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+
+                        outputImage2.at<uchar>(baseRow, baseCol) = 255;
+                        outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+                    }
+                    else {
+                        outputImage2.at<uchar>(baseRow, baseCol) = 0;
+                        outputImage2.at<uchar>(baseRow, baseCol + 1) = 255;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol) = 255;
+                        outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+
+                        outputImage1.at<uchar>(baseRow, baseCol) = 255;
+                        outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol) = 0;
+                        outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+                    }
+                }
+            }
+            else {
+                if (random < 0.166f) {
                     outputImage1.at<uchar>(baseRow, baseCol) = 0;
                     outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
                     outputImage1.at<uchar>(baseRow + 1, baseCol) = 255;
                     outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+
+                    outputImage2.at<uchar>(baseRow, baseCol) = 0;
+                    outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
+                    outputImage2.at<uchar>(baseRow + 1, baseCol) = 255;
+                    outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+                }
+                if (random < 0.333f) {
+                    outputImage1.at<uchar>(baseRow, baseCol) = 255;
+                    outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
+                    outputImage1.at<uchar>(baseRow + 1, baseCol) = 0;
+                    outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 0;
 
                     outputImage2.at<uchar>(baseRow, baseCol) = 255;
                     outputImage2.at<uchar>(baseRow, baseCol + 1) = 255;
                     outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
                     outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 0;
                 }
-                else if (random < 0.666f) {
+                else if (random < 0.499f) {
                     outputImage1.at<uchar>(baseRow, baseCol) = 0;
                     outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
                     outputImage1.at<uchar>(baseRow + 1, baseCol) = 0;
                     outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
 
-                    outputImage2.at<uchar>(baseRow, baseCol) = 255;
-                    outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
-                    outputImage2.at<uchar>(baseRow + 1, baseCol) = 255;
-                    outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 0;
+                    outputImage2.at<uchar>(baseRow, baseCol) = 0;
+                    outputImage2.at<uchar>(baseRow, baseCol + 1) = 255;
+                    outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
+                    outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
                 }
-                else {
-                    outputImage1.at<uchar>(baseRow, baseCol) = 0;
-                    outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
+                else if (random < 0.666f) {
+                    outputImage1.at<uchar>(baseRow, baseCol) = 255;
+                    outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
                     outputImage1.at<uchar>(baseRow + 1, baseCol) = 255;
                     outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 0;
 
                     outputImage2.at<uchar>(baseRow, baseCol) = 255;
                     outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
-                    outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
-                    outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
-                }
-            }
-            else {
-                if (random < 0.33f) {
-                    outputImage1.at<uchar>(baseRow, baseCol) = 0;
-                    outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
-                    outputImage1.at<uchar>(baseRow + 1, baseCol) = 255;
-                    outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
-
-                    outputImage2.at<uchar>(baseRow, baseCol) = 0;
-                    outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
                     outputImage2.at<uchar>(baseRow + 1, baseCol) = 255;
-                    outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
+                    outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 0;
                 }
-                else if (random < 0.66f) {
-                    outputImage1.at<uchar>(baseRow, baseCol) = 0;
-                    outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
+                else if (random < 0.833f) {
+                    outputImage1.at<uchar>(baseRow, baseCol) = 255;
+                    outputImage1.at<uchar>(baseRow, baseCol + 1) = 0;
                     outputImage1.at<uchar>(baseRow + 1, baseCol) = 0;
                     outputImage1.at<uchar>(baseRow + 1, baseCol + 1) = 255;
 
-                    outputImage2.at<uchar>(baseRow, baseCol) = 0;
-                    outputImage2.at<uchar>(baseRow, baseCol + 1) = 255;
+                    outputImage2.at<uchar>(baseRow, baseCol) = 255;
+                    outputImage2.at<uchar>(baseRow, baseCol + 1) = 0;
                     outputImage2.at<uchar>(baseRow + 1, baseCol) = 0;
                     outputImage2.at<uchar>(baseRow + 1, baseCol + 1) = 255;
                 }
+
                 else {
                     outputImage1.at<uchar>(baseRow, baseCol) = 0;
                     outputImage1.at<uchar>(baseRow, baseCol + 1) = 255;
@@ -127,21 +210,21 @@ void convertToBlackAndWhite(const std::string& inputImagePath, const std::string
 int main() {
     cv::Mat inputImage = cv::imread("input_image.png", cv::IMREAD_GRAYSCALE);
     if (inputImage.empty()) {
-        std::cerr << "Nie uda³o siê wczytaæ obrazu!" << std::endl;
+        std::cerr << "Cannot read img!" << std::endl;
         return -1;
     }
 
     cv::Mat outputImage1;
     cv::Mat outputImage2;
 
-    int num_threads = 4; // Adjust the number of threads as needed
+    int num_threads = 4; 
 
     encodeImage(inputImage, outputImage1, outputImage2, num_threads);
 
     cv::imwrite("encoded_image1.png", outputImage1);
     cv::imwrite("encoded_image2.png", outputImage2);
 
-    std::cout << "Obraz zosta³ zakodowany i zapisany jako encoded_image.png" << std::endl;
+    std::cout << "Podzielono sekret na 2 udzia³y" << std::endl;
 
     return 0;
 }
